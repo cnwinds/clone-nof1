@@ -1,0 +1,16 @@
+{
+  "buildCommand": "npm run build",
+  "framework": "nextjs",
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=30, stale-while-revalidate"
+        }
+      ]
+    }
+  ]
+}
+
