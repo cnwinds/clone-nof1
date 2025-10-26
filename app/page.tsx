@@ -7,6 +7,7 @@ import ModelSelector from '@/components/ModelSelector';
 import TabSystem from '@/components/TabSystem';
 import ConnectionStatus from '@/components/ConnectionStatus';
 import { useModelsStore } from '@/lib/store/useModelsStore';
+import DataSourceDebug from '@/components/DataSourceDebug';
 
 export default function Home() {
   const { loadModels, loadTrades, loadPositions, loadAutomatedChats } = useModelsStore();
@@ -22,6 +23,7 @@ export default function Home() {
   return (
     <>
       <ConnectionStatus />
+      <DataSourceDebug />
       
       <div className="min-h-screen bg-black text-terminal-green">
         {/* Header */}

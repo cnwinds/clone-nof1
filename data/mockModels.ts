@@ -220,6 +220,7 @@ function generateTrades(modelId: string, modelName: string, count: number = 30):
     
     trades.push({
       id: `${modelId}-trade-${i}`,
+      seasonModelId: `sm_${modelId}_001`,
       modelId,
       modelName,
       symbol,
@@ -232,7 +233,10 @@ function generateTrades(modelId: string, modelName: string, count: number = 30):
       holdingTime,
       pnl: Number(pnl.toFixed(2)),
       pnlPercent: Number(pnlPercent.toFixed(2)),
-      timestamp: new Date(now - (count - i) * 3600000).toISOString(),
+      status: 'closed',
+      entryTimestamp: new Date(now - (count - i) * 3600000).toISOString(),
+      exitTimestamp: new Date(now - (count - i) * 3600000 + holdingMinutes * 60000).toISOString(),
+      createdAt: new Date(now - (count - i) * 3600000).toISOString(),
     });
   }
   
@@ -280,6 +284,7 @@ function generatePositions(modelId: string, modelName: string): Position[] {
     
     positions.push({
       id: `${modelId}-pos-${index}`,
+      seasonModelId: `sm_${modelId}_001`,
       modelId,
       modelName,
       modelIcon,
@@ -294,7 +299,8 @@ function generatePositions(modelId: string, modelName: string): Position[] {
       unrealizedPnl,
       profitPercent,
       availableCash: config.availableCash,
-      timestamp: new Date(Date.now() - Math.random() * 86400000).toISOString(),
+      createdAt: new Date(Date.now() - Math.random() * 86400000).toISOString(),
+      updatedAt: new Date().toISOString(),
     });
   });
   

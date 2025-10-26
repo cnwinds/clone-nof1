@@ -21,8 +21,16 @@ export default function ModelChat() {
 
   // 根据过滤器筛选聊天记录
   const filteredChats = chatFilterModel === 'all'
-    ? automatedChats
-    : automatedChats.filter(chat => chat.modelId === chatFilterModel);
+    ? (automatedChats || [])
+    : (automatedChats || []).filter(chat => chat.modelId === chatFilterModel);
+
+  // 调试信息
+  console.log('ModelChat Debug:', {
+    chatFilterModel,
+    totalChats: automatedChats?.length || 0,
+    filteredChats: filteredChats.length,
+    models: models.map(m => ({ id: m.id, name: m.displayName }))
+  });
 
   const toggleSection = (chatId: string, sectionType: string) => {
     const key = `${chatId}-${sectionType}`;

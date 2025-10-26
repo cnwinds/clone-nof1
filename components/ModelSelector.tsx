@@ -64,7 +64,7 @@ export default function ModelSelector() {
                     {/* 当前价值和涨跌幅在同一行 */}
                     <div className="flex items-center justify-between">
                       <div className="text-terminal-green text-sm font-bold">
-                        ${model.currentValue.toLocaleString('en-US', {
+                        ${(model.currentValue || 0).toLocaleString('en-US', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
@@ -76,7 +76,7 @@ export default function ModelSelector() {
                       >
                         {isPositive ? '▲' : '▼'}
                         {isPositive ? '+' : ''}
-                        {model.performance.toFixed(2)}%
+                        {(model.performance || 0).toFixed(2)}%
                       </div>
                     </div>
 

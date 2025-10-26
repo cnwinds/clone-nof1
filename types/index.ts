@@ -3,12 +3,12 @@ export interface CryptoPrice {
   id: string;
   symbol: string;
   name: string;
-  current_price: number;
-  price_change_percentage_24h: number;
-  market_cap: number;
-  high_24h: number;
-  low_24h: number;
-  last_updated: string;
+  currentPrice: number;
+  priceChangePercentage24h: number;
+  marketCap: number;
+  high24h: number;
+  low24h: number;
+  lastUpdated: string;
 }
 
 // 图表数据点类型
@@ -33,24 +33,29 @@ export interface ValuePoint {
 // 交易记录类型（多模型增强版）
 export interface Trade {
   id: string;
+  seasonModelId: string;  // 赛季模型ID
   modelId: string;        // 所属模型 ID
   modelName: string;      // 模型名称
   symbol: string;
   type: 'long' | 'short'; // 做多/做空
   entryPrice: number;     // 入场价格
-  exitPrice: number;      // 出场价格
+  exitPrice?: number;     // 出场价格
   quantity: number;       // 数量
   entryNotional: number;  // 入场名义价值
-  exitNotional: number;   // 出场名义价值
-  holdingTime: string;    // 持仓时间（如 "2H", "14M"）
-  pnl: number;           // 盈亏金额
-  pnlPercent: number;    // 盈亏百分比
-  timestamp: string;
+  exitNotional?: number;  // 出场名义价值
+  holdingTime?: string;   // 持仓时间（如 "2H", "14M"）
+  pnl?: number;          // 盈亏金额
+  pnlPercent?: number;   // 盈亏百分比
+  status: 'open' | 'closed'; // 状态
+  entryTimestamp: string; // 入场时间戳
+  exitTimestamp?: string; // 出场时间戳
+  createdAt: string;      // 创建时间
 }
 
 // 持仓类型
 export interface Position {
   id: string;
+  seasonModelId: string; // 赛季模型ID
   modelId: string;       // 所属模型 ID
   modelName: string;     // 模型名称
   modelIcon: string;     // 模型图标
@@ -65,7 +70,8 @@ export interface Position {
   unrealizedPnl: number; // 未实现盈亏
   profitPercent: number; // 盈亏百分比
   availableCash: number; // 可用现金
-  timestamp: string;
+  createdAt: string;     // 创建时间
+  updatedAt: string;    // 更新时间
 }
 
 // AI 模型类型（增强版）
@@ -112,6 +118,7 @@ export interface ChatSection {
 // 自动化聊天记录类型
 export interface AutomatedChat {
   id: string;
+  seasonModelId: string;  // 赛季模型ID
   modelId: string;        // 所属模型 ID
   modelName: string;      // 模型名称
   icon: string;           // 模型图标
@@ -132,13 +139,44 @@ export interface AccountInfo {
 // 连接状态类型
 export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
 
+// 赛季类型
+export interface Season {
+  id: string;
+  name: string;
+  description?: string;
+  initialCapital: number;
+  startTime: string;
+  endTime: string;
+  status: 'pending' | 'active' | 'completed';
+  createdAt: string;
+  updatedAt: string;
+}
+
+// 赛季模型类型（赛季中的模型实例）
+export interface SeasonModel {
+  id: string;
+  seasonId: string;
+  modelId: string;
+  displayName: string;
+  color: string;
+  icon: string;
+  currentValue: number;
+  performance: number;
+  rank: number;
+  status: 'active' | 'inactive';
+}
+
 // 数据服务接口
 export interface IDataService {
   getModels(): Promise<AIModel[]>;
   getModelById(id: string): Promise<AIModel | null>;
-  getTrades(modelId?: string, limit?: number): Promise<Trade[]>;
-  getPositions(modelId?: string): Promise<Position[]>;
+  getTrades(seasonId?: string, modelId?: string, limit?: number): Promise<Trade[]>;
+  getPositions(seasonId?: string, modelId?: string): Promise<Position[]>;
   getValueHistory(modelId: string, days: number): Promise<ValuePoint[]>;
-  getAutomatedChats(modelId?: string, limit?: number): Promise<AutomatedChat[]>;
+  getAutomatedChats(seasonId?: string, modelId?: string, limit?: number): Promise<AutomatedChat[]>;
+  // 赛季相关方法
+  getSeasons(status?: string): Promise<Season[]>;
+  getActiveSeason(): Promise<Season | null>;
+  getSeasonById(seasonId: string): Promise<Season | null>;
 }
 

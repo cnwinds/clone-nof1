@@ -45,11 +45,11 @@ export default function Leaderboard() {
               <div className="font-mono text-xs">{model.displayName}</div>
               <div
                 className={`text-right font-bold ${
-                  model.performance >= 0 ? 'text-terminal-green' : 'text-red-500'
+                  (model.performance || 0) >= 0 ? 'text-terminal-green' : 'text-red-500'
                 }`}
               >
-                {model.performance >= 0 ? '+' : ''}
-                {model.performance.toFixed(2)}%
+                {(model.performance || 0) >= 0 ? '+' : ''}
+                {(model.performance || 0).toFixed(2)}%
               </div>
               <div className="text-right">
                 {model.winRate ? model.winRate.toFixed(1) : 'N/A'}%

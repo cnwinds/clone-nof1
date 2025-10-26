@@ -55,20 +55,20 @@ export default function EnhancedTicker() {
                   <span className="font-bold text-base">{crypto.symbol.toUpperCase()}</span>
                   <div className="flex items-center text-sm">
                     <span>
-                      ${crypto.current_price.toLocaleString('en-US', {
+                      ${(crypto.currentPrice || 0).toLocaleString('en-US', {
                         minimumFractionDigits: 2,
-                        maximumFractionDigits: crypto.current_price < 1 ? 4 : 2,
+                        maximumFractionDigits: (crypto.currentPrice || 0) < 1 ? 4 : 2,
                       })}
                     </span>
                     <span
                       className={`ml-2 ${
-                        crypto.price_change_percentage_24h >= 0
+                        (crypto.priceChangePercentage24h || 0) >= 0
                           ? 'text-terminal-green'
                           : 'text-red-500'
                       }`}
                     >
-                      {crypto.price_change_percentage_24h >= 0 ? '▲' : '▼'}
-                      {Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%
+                      {(crypto.priceChangePercentage24h || 0) >= 0 ? '▲' : '▼'}
+                      {Math.abs(crypto.priceChangePercentage24h || 0).toFixed(2)}%
                     </span>
                   </div>
                 </div>
@@ -93,13 +93,13 @@ export default function EnhancedTicker() {
                   {highestModel.displayName}
                 </span>
                 <span className="text-terminal-green text-sm">
-                  ${highestModel.currentValue.toLocaleString('en-US', {
+                  ${(highestModel.currentValue || 0).toLocaleString('en-US', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 </span>
                 <span className="text-terminal-green font-bold text-sm">
-                  +{highestModel.performance.toFixed(2)}%
+                  +{(highestModel.performance || 0).toFixed(2)}%
                 </span>
               </div>
             </div>
@@ -115,13 +115,13 @@ export default function EnhancedTicker() {
                   {lowestModel.displayName}
                 </span>
                 <span className="text-red-500 text-sm">
-                  ${lowestModel.currentValue.toLocaleString('en-US', {
+                  ${(lowestModel.currentValue || 0).toLocaleString('en-US', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 </span>
                 <span className="text-red-500 font-bold text-sm">
-                  {lowestModel.performance.toFixed(2)}%
+                  {(lowestModel.performance || 0).toFixed(2)}%
                 </span>
               </div>
             </div>

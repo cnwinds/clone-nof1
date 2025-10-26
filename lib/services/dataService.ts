@@ -1,6 +1,7 @@
 import type { IDataService } from '@/types';
 import { MockDataService } from './mockDataService';
 import { APIDataService } from './apiDataService';
+import { ENV_CONFIG } from '@/lib/config/env';
 
 /**
  * 统一的数据服务接口
@@ -18,10 +19,8 @@ import { APIDataService } from './apiDataService';
  *    NEXT_PUBLIC_API_BASE=https://api.nof1.ai
  */
 
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK !== 'false';
-
 // 根据环境变量选择数据服务实现
-export const dataService: IDataService = USE_MOCK_DATA
+export const dataService: IDataService = ENV_CONFIG.USE_MOCK_DATA
   ? new MockDataService()
   : new APIDataService();
 
@@ -31,9 +30,8 @@ export type { IDataService };
 // 导出提示信息
 export const getDataSourceInfo = () => {
   return {
-    useMock: USE_MOCK_DATA,
-    source: USE_MOCK_DATA ? 'Mock Data' : 'API',
-    apiBase: USE_MOCK_DATA ? 'N/A' : process.env.NEXT_PUBLIC_API_BASE,
+    useMock: ENV_CONFIG.USE_MOCK_DATA,
+    source: ENV_CONFIG.USE_MOCK_DATA ? 'Mock Data' : 'API',
+    apiBase: ENV_CONFIG.USE_MOCK_DATA ? 'N/A' : ENV_CONFIG.API_BASE,
   };
 };
-

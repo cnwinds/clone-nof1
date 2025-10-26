@@ -1,4 +1,4 @@
-import type { AIModel, Trade, Position, ValuePoint, AutomatedChat, IDataService } from '@/types';
+import type { AIModel, Trade, Position, ValuePoint, AutomatedChat, Season, IDataService } from '@/types';
 import { mockModels, mockTrades, mockPositions } from '@/data/mockModels';
 
 /**
@@ -26,10 +26,11 @@ export class MockDataService implements IDataService {
 
   /**
    * 获取交易记录
+   * @param seasonId 可选，筛选特定赛季的交易
    * @param modelId 可选，筛选特定模型的交易
    * @param limit 返回记录数量限制
    */
-  async getTrades(modelId?: string, limit: number = 100): Promise<Trade[]> {
+  async getTrades(seasonId?: string, modelId?: string, limit: number = 100): Promise<Trade[]> {
     await this.delay(150);
     
     let filtered = [...mockTrades];
@@ -41,7 +42,7 @@ export class MockDataService implements IDataService {
     
     // 按时间倒序排列
     filtered.sort((a, b) => 
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
     
     // 限制数量
@@ -50,9 +51,10 @@ export class MockDataService implements IDataService {
 
   /**
    * 获取持仓列表
+   * @param seasonId 可选，筛选特定赛季的持仓
    * @param modelId 可选，筛选特定模型的持仓
    */
-  async getPositions(modelId?: string): Promise<Position[]> {
+  async getPositions(seasonId?: string, modelId?: string): Promise<Position[]> {
     await this.delay(100);
     
     let filtered = [...mockPositions];
@@ -86,16 +88,18 @@ export class MockDataService implements IDataService {
 
   /**
    * 获取自动化聊天记录
+   * @param seasonId 可选，筛选特定赛季的聊天记录
    * @param modelId 可选，筛选特定模型的聊天记录
    * @param limit 返回记录数量限制
    */
-  async getAutomatedChats(modelId?: string, limit: number = 50): Promise<AutomatedChat[]> {
+  async getAutomatedChats(seasonId?: string, modelId?: string, limit: number = 50): Promise<AutomatedChat[]> {
     await this.delay(150);
     
     // 生成模拟的自动化聊天记录（基于图片中的实际内容）
     const mockChats: AutomatedChat[] = [
       {
         id: '1',
+        seasonModelId: 'sm_claude_001',
         modelId: 'claude-sonnet-4.5',
         modelName: 'CLAUDE SONNET 4.5',
         icon: '✦',
@@ -128,6 +132,7 @@ export class MockDataService implements IDataService {
       },
       {
         id: '2',
+        seasonModelId: 'sm_gpt_001',
         modelId: 'gpt-5',
         modelName: 'GPT 5',
         icon: '⚙️',
@@ -159,6 +164,7 @@ export class MockDataService implements IDataService {
       },
       {
         id: '3',
+        seasonModelId: 'sm_qwen_001',
         modelId: 'qwen3-max',
         modelName: 'QWEN3 MAX',
         icon: '⚡',
@@ -188,6 +194,7 @@ export class MockDataService implements IDataService {
       },
       {
         id: '4',
+        seasonModelId: 'sm_deepseek_001',
         modelId: 'deepseek-chat-v3.1',
         modelName: 'DEEPSEEK CHAT V3.1',
         icon: '🐋',
@@ -221,6 +228,7 @@ export class MockDataService implements IDataService {
       },
       {
         id: '5',
+        seasonModelId: 'sm_gemini_001',
         modelId: 'gemini-2.5-pro',
         modelName: 'GEMINI 2.5 PRO',
         icon: '💎',
@@ -268,6 +276,53 @@ export class MockDataService implements IDataService {
     
     // 限制数量
     return filtered.slice(0, limit);
+  }
+
+  /**
+   * 获取所有赛季
+   */
+  async getSeasons(status?: string): Promise<Season[]> {
+    await this.delay(100);
+    
+    const mockSeasons: Season[] = [
+      {
+        id: 'season_001',
+        name: '2024 Q1 Trading Season',
+        description: '第一季度交易赛季',
+        initialCapital: 10000,
+        startTime: '2024-01-01T00:00:00Z',
+        endTime: '2024-03-31T23:59:59Z',
+        status: 'active',
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z'
+      }
+    ];
+    
+    if (status) {
+      return mockSeasons.filter(s => s.status === status);
+    }
+    
+    return mockSeasons;
+  }
+
+  /**
+   * 获取当前活跃赛季
+   */
+  async getActiveSeason(): Promise<Season | null> {
+    await this.delay(100);
+    
+    const seasons = await this.getSeasons('active');
+    return seasons.length > 0 ? seasons[0] : null;
+  }
+
+  /**
+   * 根据ID获取赛季详情
+   */
+  async getSeasonById(seasonId: string): Promise<Season | null> {
+    await this.delay(100);
+    
+    const seasons = await this.getSeasons();
+    return seasons.find(s => s.id === seasonId) || null;
   }
 
   /**

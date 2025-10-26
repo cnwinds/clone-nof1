@@ -95,6 +95,7 @@ export const useModelsStore = create<ModelsState>((set, get) => ({
       const models = await dataService.getModels();
       set({ models, loading: false });
     } catch (error) {
+      console.error('❌ 模型数据加载失败:', error);
       set({ 
         error: error instanceof Error ? error.message : 'Failed to load models',
         loading: false 
@@ -126,9 +127,10 @@ export const useModelsStore = create<ModelsState>((set, get) => ({
   loadAutomatedChats: async (modelId?: string) => {
     try {
       const automatedChats = await dataService.getAutomatedChats(modelId, 50);
-      set({ automatedChats });
+      set({ automatedChats: automatedChats || [] });
     } catch (error) {
       console.error('Failed to load automated chats:', error);
+      set({ automatedChats: [] });
     }
   },
 

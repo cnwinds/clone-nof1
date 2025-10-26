@@ -50,7 +50,9 @@ export default function MultiModelChart() {
   const [chartData, setChartData] = useState<any>(null);
 
   useEffect(() => {
-    if (models.length === 0) return;
+    if (models.length === 0) {
+      return;
+    }
 
     prepareChartData();
   }, [models, selectedModel, timeRange, displayMode]);
@@ -341,6 +343,16 @@ export default function MultiModelChart() {
       <div className="flex-1 relative">
         {chartData ? (
           <Line data={chartData} options={options} />
+        ) : models.length > 0 ? (
+          <div className="flex items-center justify-center h-full text-terminal-green">
+            <div className="text-center">
+              <div className="text-xl mb-2">[ ████████████ ]</div>
+              <div className="animate-pulse">No Chart Data Available</div>
+              <div className="text-sm text-terminal-dark-green mt-2">
+                Models loaded but no value history data
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="flex items-center justify-center h-full text-terminal-green">
             <div className="text-center">

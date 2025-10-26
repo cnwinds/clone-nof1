@@ -37,19 +37,19 @@ export default function TradesList() {
         </div>
         
         <div className="text-terminal-dark-green text-xs">
-          Showing Last {trades.length} Trades
+          Showing Last {trades?.length || 0} Trades
         </div>
       </div>
 
       {/* 交易列表 */}
       <div className="flex-1 space-y-3 overflow-y-auto">
-        {trades.length === 0 ? (
+        {!trades || trades.length === 0 ? (
           <div className="text-terminal-dark-green text-center py-8">
             No trades found
           </div>
         ) : (
           trades.map(trade => {
-            const isProfit = trade.pnl >= 0;
+            const isProfit = (trade.pnl || 0) >= 0;
             const tradeTypeColor = trade.type === 'long' ? 'text-terminal-green' : 'text-red-500';
             
             return (
@@ -75,16 +75,16 @@ export default function TradesList() {
                 {/* 交易详情 */}
                 <div className="grid grid-cols-2 gap-2 text-xs text-terminal-green">
                   <div>
-                    Price: ${trade.entryPrice.toFixed(5)} → ${trade.exitPrice.toFixed(5)}
+                    Price: ${(trade.entryPrice || 0).toFixed(5)} → ${(trade.exitPrice || 0).toFixed(5)}
                   </div>
                   <div>
-                    Quantity: {trade.quantity.toFixed(2)}
+                    Quantity: {(trade.quantity || 0).toFixed(2)}
                   </div>
                   <div>
-                    Notional: ${trade.entryNotional.toFixed(0)} → ${trade.exitNotional.toFixed(0)}
+                    Notional: ${(trade.entryNotional || 0).toFixed(0)} → ${(trade.exitNotional || 0).toFixed(0)}
                   </div>
                   <div>
-                    Holding time: {trade.holdingTime}
+                    Holding time: {trade.holdingTime || 'N/A'}
                   </div>
                 </div>
 
@@ -95,7 +95,7 @@ export default function TradesList() {
                       isProfit ? 'text-terminal-green' : 'text-red-500'
                     }`}
                   >
-                    NET P&L: {isProfit ? '+' : ''}${trade.pnl.toFixed(2)}
+                    NET P&L: {isProfit ? '+' : ''}${(trade.pnl || 0).toFixed(2)}
                   </span>
                 </div>
               </div>

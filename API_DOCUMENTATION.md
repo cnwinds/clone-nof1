@@ -45,9 +45,136 @@
 
 ## API接口列表
 
-### 1. 模型管理
+### 1. 赛季管理
 
-#### 1.1 获取所有模型
+#### 1.1 获取所有赛季
+```http
+GET /api/seasons?status={status}
+```
+
+**查询参数**:
+- `status` (string, optional): 过滤状态: pending/active/completed
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "season_001",
+      "name": "2024 Q1 Trading Season",
+      "description": "第一季度交易赛季",
+      "initialCapital": 10000,
+      "startTime": "2024-01-01T00:00:00Z",
+      "endTime": "2024-03-31T23:59:59Z",
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "timestamp": "2024-01-01T00:00:00Z"
+}
+```
+
+#### 1.2 获取当前活跃赛季
+```http
+GET /api/seasons/active
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": "season_001",
+    "name": "2024 Q1 Trading Season",
+    "description": "第一季度交易赛季",
+    "initialCapital": 10000,
+    "startTime": "2024-01-01T00:00:00Z",
+    "endTime": "2024-03-31T23:59:59Z",
+    "status": "active",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  "timestamp": "2024-01-01T00:00:00Z"
+}
+```
+
+#### 1.3 获取赛季详情（含模型排名）
+```http
+GET /api/seasons/{seasonId}
+```
+
+**路径参数**:
+- `seasonId` (string): 赛季ID
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": "season_001",
+    "name": "2024 Q1 Trading Season",
+    "description": "第一季度交易赛季",
+    "initialCapital": 10000,
+    "startTime": "2024-01-01T00:00:00Z",
+    "endTime": "2024-03-31T23:59:59Z",
+    "status": "active",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z",
+    "models": [
+      {
+        "id": "sm_001",
+        "modelId": "qwen3-max",
+        "displayName": "QWEN3 MAX",
+        "color": "#9370db",
+        "icon": "✦",
+        "currentValue": 17130.8,
+        "performance": 71.31,
+        "rank": 1,
+        "status": "active"
+      }
+    ]
+  },
+  "timestamp": "2024-01-01T00:00:00Z"
+}
+```
+
+#### 1.4 创建赛季
+```http
+POST /api/seasons
+```
+
+**请求体**:
+```json
+{
+  "name": "2024 Q2 Trading Season",
+  "description": "第二季度交易赛季",
+  "initialCapital": 10000,
+  "startTime": "2024-04-01T00:00:00Z",
+  "endTime": "2024-06-30T23:59:59Z",
+  "modelIds": ["qwen3-max", "gpt4", "claude3"]
+}
+```
+
+#### 1.5 开始赛季
+```http
+POST /api/seasons/{seasonId}/start
+```
+
+#### 1.6 结束赛季
+```http
+POST /api/seasons/{seasonId}/end
+```
+
+#### 1.7 更新赛季
+```http
+PUT /api/seasons/{seasonId}
+```
+
+### 2. 模型管理
+
+#### 2.1 获取激活的模型
 ```http
 GET /api/models
 ```
@@ -61,66 +188,78 @@ GET /api/models
       "id": "qwen3-max",
       "name": "qwen3-max",
       "displayName": "QWEN3 MAX",
-      "initialValue": 10000,
-      "currentValue": 17130.8,
-      "performance": 71.31,
       "color": "#9370db",
       "icon": "✦",
-      "status": "active",
       "description": "Alibaba Qwen3 Max with superior performance",
-      "rank": 1,
-      "winRate": 78.5,
-      "totalTrades": 267,
-      "valueHistory": [
-        {
-          "timestamp": 1700000000000,
-          "value": 10000
-        }
-      ]
+      "llmProvider": "qwen",
+      "llmModel": "qwen-max",
+      "strategyPrompt": "You are a conservative trading AI...",
+      "tradingMode": "paper",
+      "exchangeName": "binance",
+      "executionInterval": 15,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
     }
-  ]
+  ],
+  "timestamp": "2024-01-01T00:00:00Z"
 }
 ```
 
-#### 1.2 获取单个模型
+#### 2.2 获取所有模型（管理员接口）
 ```http
-GET /api/models/{id}
+GET /api/models/all
+```
+
+#### 2.3 获取单个模型
+```http
+GET /api/models/{modelId}
 ```
 
 **路径参数**:
-- `id` (string): 模型ID
+- `modelId` (string): 模型ID
 
-**响应示例**:
+#### 2.4 创建模型
+```http
+POST /api/models
+```
+
+**请求体**:
 ```json
 {
-  "success": true,
-  "data": {
-    "id": "qwen3-max",
-    "name": "qwen3-max",
-    "displayName": "QWEN3 MAX",
-    "initialValue": 10000,
-    "currentValue": 17130.8,
-    "performance": 71.31,
-    "color": "#9370db",
-    "icon": "✦",
-    "status": "active",
-    "description": "Alibaba Qwen3 Max with superior performance",
-    "rank": 1,
-    "winRate": 78.5,
-    "totalTrades": 267,
-    "valueHistory": []
-  }
+  "name": "gpt4-turbo",
+  "displayName": "GPT-4 Turbo",
+  "color": "#10a37f",
+  "icon": "🧠",
+  "description": "OpenAI GPT-4 Turbo model",
+  "llmProvider": "openai",
+  "llmModel": "gpt-4-turbo",
+  "strategyPrompt": "You are an aggressive trading AI...",
+  "tradingMode": "paper",
+  "exchangeName": "binance",
+  "executionInterval": 10
 }
 ```
 
-### 2. 交易记录
-
-#### 2.1 获取交易记录
+#### 2.5 更新模型
 ```http
-GET /api/trades?modelId={modelId}&limit={limit}
+PUT /api/models/{modelId}
+```
+
+#### 2.6 删除模型
+```http
+DELETE /api/models/{modelId}
+```
+
+### 3. 交易记录
+
+#### 3.1 获取交易记录
+```http
+GET /api/trades?seasonId={seasonId}&modelId={modelId}&limit={limit}
 ```
 
 **查询参数**:
+- `seasonId` (string, optional): 赛季ID，不传则返回所有赛季的交易
 - `modelId` (string, optional): 模型ID，不传则返回所有模型的交易
 - `limit` (number, optional): 返回记录数量限制，默认100
 
@@ -131,8 +270,7 @@ GET /api/trades?modelId={modelId}&limit={limit}
   "data": [
     {
       "id": "trade_001",
-      "modelId": "qwen3-max",
-      "modelName": "QWEN3 MAX",
+      "seasonModelId": "sm_001",
       "symbol": "BTC",
       "type": "long",
       "entryPrice": 45000,
@@ -143,20 +281,34 @@ GET /api/trades?modelId={modelId}&limit={limit}
       "holdingTime": "2H",
       "pnl": 200,
       "pnlPercent": 4.44,
-      "timestamp": "2024-01-01T10:00:00Z"
+      "status": "closed",
+      "entryTimestamp": "2024-01-01T10:00:00Z",
+      "exitTimestamp": "2024-01-01T12:00:00Z",
+      "createdAt": "2024-01-01T10:00:00Z",
+      "modelName": "QWEN3 MAX"
     }
-  ]
+  ],
+  "timestamp": "2024-01-01T00:00:00Z"
 }
 ```
 
-### 3. 持仓管理
-
-#### 3.1 获取持仓列表
+#### 3.2 获取单个交易
 ```http
-GET /api/positions?modelId={modelId}
+GET /api/trades/{tradeId}
+```
+
+**路径参数**:
+- `tradeId` (string): 交易ID
+
+### 4. 持仓管理
+
+#### 4.1 获取持仓列表
+```http
+GET /api/positions?seasonId={seasonId}&modelId={modelId}
 ```
 
 **查询参数**:
+- `seasonId` (string, optional): 赛季ID，不传则返回所有赛季的持仓
 - `modelId` (string, optional): 模型ID，不传则返回所有模型的持仓
 
 **响应示例**:
@@ -166,11 +318,8 @@ GET /api/positions?modelId={modelId}
   "data": [
     {
       "id": "position_001",
-      "modelId": "qwen3-max",
-      "modelName": "QWEN3 MAX",
-      "modelIcon": "✦",
+      "seasonModelId": "sm_001",
       "symbol": "BTC",
-      "coinLogo": "₿",
       "side": "LONG",
       "leverage": 20,
       "amount": 0.12,
@@ -179,16 +328,29 @@ GET /api/positions?modelId={modelId}
       "notional": 5640,
       "unrealizedPnl": 240,
       "profitPercent": 4.44,
-      "availableCash": 97,
-      "timestamp": "2024-01-01T10:00:00Z"
+      "createdAt": "2024-01-01T10:00:00Z",
+      "updatedAt": "2024-01-01T10:00:00Z",
+      "modelName": "QWEN3 MAX",
+      "modelIcon": "✦",
+      "coinLogo": "₿",
+      "availableCash": 97
     }
-  ]
+  ],
+  "timestamp": "2024-01-01T00:00:00Z"
 }
 ```
 
-### 4. 价值历史
+#### 4.2 获取单个持仓
+```http
+GET /api/positions/{positionId}
+```
 
-#### 4.1 获取价值历史曲线
+**路径参数**:
+- `positionId` (string): 持仓ID
+
+### 5. 价值历史
+
+#### 5.1 获取价值历史曲线
 ```http
 GET /api/value-history/{modelId}?days={days}
 ```
@@ -212,11 +374,12 @@ GET /api/value-history/{modelId}?days={days}
       "timestamp": 1700003600000,
       "value": 10100
     }
-  ]
+  ],
+  "timestamp": "2024-01-01T00:00:00Z"
 }
 ```
 
-### 5. 自动化聊天
+### 6. 自动化聊天
 
 #### 5.1 获取自动化聊天记录
 ```http
@@ -269,9 +432,64 @@ GET /api/automated-chats?modelId={modelId}&limit={limit}
 }
 ```
 
-### 6. 加密货币价格 (现有API)
+### 6. 自动化聊天
 
-#### 6.1 获取加密货币价格
+#### 6.1 获取自动化聊天记录
+```http
+GET /api/automated-chats?seasonId={seasonId}&modelId={modelId}&limit={limit}
+```
+
+**查询参数**:
+- `seasonId` (string, optional): 赛季ID，不传则返回所有赛季的聊天记录
+- `modelId` (string, optional): 模型ID，不传则返回所有模型的聊天记录
+- `limit` (number, optional): 返回记录数量限制，默认50
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "chat_001",
+      "seasonModelId": "sm_001",
+      "modelName": "QWEN3 MAX",
+      "icon": "✦",
+      "content": "The XRP position is currently profitable due to strong upward momentum...",
+      "timestamp": "2024-01-01T10:00:00Z",
+      "expandable": true,
+      "sections": [
+        {
+          "type": "USER_PROMPT",
+          "content": "What is your current trading status and position analysis?",
+          "expanded": false
+        },
+        {
+          "type": "CHAIN_OF_THOUGHT",
+          "content": "Analyzing current positions: XRP showing strong momentum...",
+          "expanded": false
+        },
+        {
+          "type": "TRADING_DECISIONS",
+          "content": [
+            {
+              "symbol": "XRP",
+              "quantity": 3609,
+              "action": "HOLD",
+              "confidence": 85
+            }
+          ],
+          "expanded": false
+        }
+      ]
+    }
+  ],
+  "timestamp": "2024-01-01T00:00:00Z"
+}
+```
+
+### 7. 加密货币价格
+
+#### 7.1 获取加密货币价格
 ```http
 GET /api/prices
 ```
@@ -285,18 +503,34 @@ GET /api/prices
       "id": "bitcoin",
       "symbol": "BTC",
       "name": "Bitcoin",
-      "current_price": 111462.50,
-      "price_change_percentage_24h": 2.5,
-      "market_cap": 2200000000000,
-      "high_24h": 112000,
-      "low_24h": 108000,
-      "last_updated": "2024-01-01T10:00:00Z"
+      "currentPrice": 111462.50,
+      "priceChangePercentage24h": 2.5,
+      "marketCap": 2200000000000,
+      "high24h": 112000,
+      "low24h": 108000,
+      "lastUpdated": "2024-01-01T10:00:00Z"
     }
-  ]
+  ],
+  "timestamp": "2024-01-01T00:00:00Z"
 }
 ```
 
 ## 数据模型定义
+
+### Season (赛季)
+```typescript
+interface Season {
+  id: string;                    // 唯一标识
+  name: string;                  // 赛季名称
+  description?: string;          // 赛季描述
+  initialCapital: number;        // 初始资金
+  startTime: string;             // 开始时间
+  endTime: string;               // 结束时间
+  status: 'pending' | 'active' | 'completed'; // 状态
+  createdAt: string;             // 创建时间
+  updatedAt: string;             // 更新时间
+}
+```
 
 ### AIModel (AI模型)
 ```typescript
@@ -304,17 +538,18 @@ interface AIModel {
   id: string;                    // 唯一标识
   name: string;                  // 内部名称
   displayName: string;           // 显示名称
-  initialValue: number;          // 初始投资金额
-  currentValue: number;          // 当前价值
-  performance: number;           // 表现百分比
   color: string;                 // 图表颜色
   icon?: string;                 // 图标
-  status: 'active' | 'inactive'; // 状态
   description?: string;          // 描述
-  rank?: number;                 // 排名
-  winRate?: number;             // 胜率
-  totalTrades?: number;         // 总交易数
-  valueHistory: ValuePoint[];    // 价值历史
+  llmProvider: string;           // LLM提供商
+  llmModel: string;              // LLM模型名称
+  strategyPrompt: string;        // 交易策略提示词
+  tradingMode: string;           // 交易模式
+  exchangeName: string;          // 交易所名称
+  executionInterval: number;     // 执行间隔（分钟）
+  status: 'active' | 'inactive'; // 状态
+  createdAt: string;             // 创建时间
+  updatedAt: string;             // 更新时间
 }
 ```
 
@@ -322,19 +557,22 @@ interface AIModel {
 ```typescript
 interface Trade {
   id: string;                    // 交易ID
-  modelId: string;               // 模型ID
-  modelName: string;             // 模型名称
+  seasonModelId: string;         // 赛季模型ID
   symbol: string;                // 交易对
   type: 'long' | 'short';       // 交易类型
   entryPrice: number;            // 入场价格
-  exitPrice: number;             // 出场价格
+  exitPrice?: number;            // 出场价格
   quantity: number;             // 数量
   entryNotional: number;         // 入场名义价值
-  exitNotional: number;          // 出场名义价值
-  holdingTime: string;           // 持仓时间
-  pnl: number;                   // 盈亏金额
-  pnlPercent: number;            // 盈亏百分比
-  timestamp: string;             // 时间戳
+  exitNotional?: number;         // 出场名义价值
+  holdingTime?: string;          // 持仓时间
+  pnl?: number;                  // 盈亏金额
+  pnlPercent?: number;           // 盈亏百分比
+  status: 'open' | 'closed';     // 状态
+  entryTimestamp: string;        // 入场时间戳
+  exitTimestamp?: string;         // 出场时间戳
+  createdAt: string;             // 创建时间
+  modelName?: string;             // 模型名称（前端显示用）
 }
 ```
 
@@ -342,11 +580,8 @@ interface Trade {
 ```typescript
 interface Position {
   id: string;                    // 持仓ID
-  modelId: string;               // 模型ID
-  modelName: string;             // 模型名称
-  modelIcon: string;             // 模型图标
+  seasonModelId: string;         // 赛季模型ID
   symbol: string;                // 交易对
-  coinLogo: string;              // 币种图标
   side: 'LONG' | 'SHORT';       // 方向
   leverage: number;              // 杠杆倍数
   amount: number;                // 数量
@@ -355,8 +590,13 @@ interface Position {
   notional: number;              // 名义价值
   unrealizedPnl: number;         // 未实现盈亏
   profitPercent: number;         // 盈亏百分比
-  availableCash: number;         // 可用现金
-  timestamp: string;             // 时间戳
+  createdAt: string;             // 创建时间
+  updatedAt: string;             // 更新时间
+  // 前端需要的额外字段
+  modelName?: string;             // 模型名称
+  modelIcon?: string;             // 模型图标
+  coinLogo?: string;              // 币种图标
+  availableCash?: number;         // 可用现金
 }
 ```
 
@@ -372,7 +612,7 @@ interface ValuePoint {
 ```typescript
 interface AutomatedChat {
   id: string;                    // 聊天ID
-  modelId: string;               // 模型ID
+  seasonModelId: string;         // 赛季模型ID
   modelName: string;             // 模型名称
   icon: string;                  // 图标
   content: string;               // 主要内容
@@ -401,12 +641,12 @@ interface CryptoPrice {
   id: string;                    // 币种ID
   symbol: string;                // 交易对符号
   name: string;                  // 币种名称
-  current_price: number;         // 当前价格
-  price_change_percentage_24h: number; // 24小时涨跌幅
-  market_cap: number;            // 市值
-  high_24h: number;              // 24小时最高价
-  low_24h: number;               // 24小时最低价
-  last_updated: string;          // 最后更新时间
+  currentPrice: number;         // 当前价格
+  priceChangePercentage24h: number; // 24小时涨跌幅
+  marketCap: number;            // 市值
+  high24h: number;              // 24小时最高价
+  low24h: number;               // 24小时最低价
+  lastUpdated: string;          // 最后更新时间
 }
 ```
 
