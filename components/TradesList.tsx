@@ -17,15 +17,15 @@ export default function TradesList() {
   }, [filterModel, loadTrades]);
 
   return (
-    <div className="space-y-4">
+    <div className="h-full flex flex-col">
       {/* 过滤器头部 */}
-      <div className="flex items-center gap-4 border-b border-terminal-dark-green pb-3">
+      <div className="flex items-center gap-4 border-b border-terminal-dark-green pb-2 flex-shrink-0">
         <div className="flex items-center gap-2">
-          <span className="text-terminal-green text-sm">FILTER:</span>
+          <span className="text-terminal-green text-xs">FILTER:</span>
           <select
             value={filterModel}
             onChange={(e) => setFilterModel(e.target.value)}
-            className="bg-black border border-terminal-green text-terminal-green px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-terminal-green"
+            className="bg-black border border-terminal-green text-terminal-green px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-terminal-green"
           >
             <option value="all">ALL MODELS</option>
             {models.map(model => (
@@ -42,7 +42,7 @@ export default function TradesList() {
       </div>
 
       {/* 交易列表 */}
-      <div className="space-y-2 max-h-[600px] overflow-y-auto">
+      <div className="flex-1 space-y-3 overflow-y-auto">
         {trades.length === 0 ? (
           <div className="text-terminal-dark-green text-center py-8">
             No trades found
@@ -55,10 +55,10 @@ export default function TradesList() {
             return (
               <div
                 key={trade.id}
-                className="border border-terminal-dark-green p-3 hover:bg-terminal-gray transition-colors"
+                className="border border-terminal-dark-green p-2 hover:bg-terminal-gray transition-colors"
               >
                 {/* 第一行：模型名称 + 交易类型 + 币种 */}
-                <div className="flex items-center gap-2 mb-2 text-sm">
+                <div className="flex items-center gap-2 mb-1 text-xs">
                   <span className="text-terminal-green font-bold">
                     {trade.modelName}
                   </span>
@@ -89,9 +89,9 @@ export default function TradesList() {
                 </div>
 
                 {/* P&L */}
-                <div className="mt-2 pt-2 border-t border-terminal-dark-green">
+                <div className="mt-1 pt-1 border-t border-terminal-dark-green">
                   <span
-                    className={`text-sm font-bold ${
+                    className={`text-xs font-bold ${
                       isProfit ? 'text-terminal-green' : 'text-red-500'
                     }`}
                   >

@@ -43,51 +43,49 @@ export default function EnhancedTicker() {
     );
   }
 
-  // 复制价格数组以实现无缝循环
-  const duplicatedPrices = [...prices, ...prices, ...prices];
-
   return (
-    <div className="bg-black border-b border-terminal-green overflow-hidden relative">
+    <div className="bg-black border-b border-terminal-green">
       <div className="flex">
-        {/* 左侧：加密货币价格滚动（60%宽度） */}
-        <div className="flex-1 overflow-hidden py-3">
-          <div className="flex animate-scroll-infinite whitespace-nowrap">
-            {duplicatedPrices.map((crypto, index) => (
+        {/* 左侧：加密货币价格静态显示 */}
+        <div className="flex-[2_2_0%] py-1 px-4">
+          <div className="flex flex-wrap gap-x-8 gap-y-2">
+            {prices.map((crypto) => (
               <div
-                key={`${crypto.id}-${index}`}
-                className="inline-flex items-center mx-8 text-terminal-green"
+                key={crypto.id}
+                className="flex flex-col text-terminal-green"
               >
-                <span className="font-bold text-lg">{crypto.symbol.toUpperCase()}</span>
-                <span className="mx-2 text-terminal-green">|</span>
-                <span className="text-lg">
-                  ${crypto.current_price.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: crypto.current_price < 1 ? 4 : 2,
-                  })}
-                </span>
-                <span
-                  className={`ml-2 text-sm ${
-                    crypto.price_change_percentage_24h >= 0
-                      ? 'text-terminal-green'
-                      : 'text-red-500'
-                  }`}
-                >
-                  {crypto.price_change_percentage_24h >= 0 ? '▲' : '▼'}
-                  {Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%
-                </span>
+                <span className="font-bold text-base">{crypto.symbol.toUpperCase()}</span>
+                <div className="flex items-center text-sm">
+                  <span>
+                    ${crypto.current_price.toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: crypto.current_price < 1 ? 4 : 2,
+                    })}
+                  </span>
+                  <span
+                    className={`ml-2 ${
+                      crypto.price_change_percentage_24h >= 0
+                        ? 'text-terminal-green'
+                        : 'text-red-500'
+                    }`}
+                  >
+                    {crypto.price_change_percentage_24h >= 0 ? '▲' : '▼'}
+                    {Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* 右侧：模型统计（40%宽度） */}
-        <div className="w-2/5 border-l border-terminal-green py-3 px-6 bg-black flex items-center justify-end gap-8">
+        {/* 右侧：模型统计 */}
+        <div className="flex-[1_1_0%] border-l border-terminal-green py-1 px-4 bg-black flex items-center justify-end gap-6">
           {highestModel && (
             <div className="text-right">
-              <div className="text-terminal-dark-green text-xs mb-1">
+              <div className="text-terminal-dark-green text-xs mb-0.5">
                 HIGHEST: 🏆
               </div>
-              <div className="flex items-center gap-2 justify-end">
+              <div className="flex items-center gap-1 justify-end">
                 <span className="text-terminal-green font-bold text-sm">
                   {highestModel.displayName}
                 </span>
@@ -106,10 +104,10 @@ export default function EnhancedTicker() {
 
           {lowestModel && (
             <div className="text-right">
-              <div className="text-terminal-dark-green text-xs mb-1">
+              <div className="text-terminal-dark-green text-xs mb-0.5">
                 LOWEST: 📉
               </div>
-              <div className="flex items-center gap-2 justify-end">
+              <div className="flex items-center gap-1 justify-end">
                 <span className="text-red-500 font-bold text-sm">
                   {lowestModel.displayName}
                 </span>
@@ -128,24 +126,6 @@ export default function EnhancedTicker() {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes scroll-infinite {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-33.333%);
-          }
-        }
-        
-        .animate-scroll-infinite {
-          animation: scroll-infinite 30s linear infinite;
-        }
-        
-        .animate-scroll-infinite:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
     </div>
   );
 }

@@ -52,12 +52,19 @@ export interface Trade {
 export interface Position {
   id: string;
   modelId: string;       // 所属模型 ID
+  modelName: string;     // 模型名称
+  modelIcon: string;     // 模型图标
   symbol: string;
-  amount: number;
-  entryPrice: number;
-  currentPrice: number;
-  profit: number;
-  profitPercent: number;
+  coinLogo: string;      // 币种图标
+  side: 'LONG' | 'SHORT'; // 多头/空头
+  leverage: number;      // 杠杆倍数
+  amount: number;        // 数量
+  entryPrice: number;    // 入场价格
+  currentPrice: number;  // 当前价格
+  notional: number;      // 名义价值
+  unrealizedPnl: number; // 未实现盈亏
+  profitPercent: number; // 盈亏百分比
+  availableCash: number; // 可用现金
   timestamp: string;
 }
 
@@ -87,6 +94,33 @@ export interface ChatMessage {
   timestamp: string;
 }
 
+// 交易决策类型
+export interface TradingDecision {
+  symbol: string;
+  quantity: number;
+  action: 'HOLD' | 'BUY' | 'SELL' | 'WATCH' | 'MONITOR' | 'RESERVE';
+  confidence: number; // 百分比
+}
+
+// 聊天记录的可展开部分
+export interface ChatSection {
+  type: 'USER_PROMPT' | 'CHAIN_OF_THOUGHT' | 'TRADING_DECISIONS';
+  content: string | TradingDecision[];
+  expanded: boolean;
+}
+
+// 自动化聊天记录类型
+export interface AutomatedChat {
+  id: string;
+  modelId: string;        // 所属模型 ID
+  modelName: string;      // 模型名称
+  icon: string;           // 模型图标
+  content: string;        // 主要聊天内容
+  timestamp: string;      // 时间戳
+  sections: ChatSection[]; // 可展开的部分
+  expandable: boolean;    // 是否可展开
+}
+
 // 账户信息类型
 export interface AccountInfo {
   totalValue: number;
@@ -105,5 +139,6 @@ export interface IDataService {
   getTrades(modelId?: string, limit?: number): Promise<Trade[]>;
   getPositions(modelId?: string): Promise<Position[]>;
   getValueHistory(modelId: string, days: number): Promise<ValuePoint[]>;
+  getAutomatedChats(modelId?: string, limit?: number): Promise<AutomatedChat[]>;
 }
 

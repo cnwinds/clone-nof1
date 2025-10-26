@@ -1,4 +1,4 @@
-import type { AIModel, Trade, Position, ValuePoint, IDataService } from '@/types';
+import type { AIModel, Trade, Position, ValuePoint, AutomatedChat, IDataService } from '@/types';
 
 /**
  * 真实 API 数据服务实现
@@ -103,6 +103,28 @@ export class APIDataService implements IDataService {
       return await response.json();
     } catch (error) {
       console.error(`Failed to fetch value history for ${modelId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * 获取自动化聊天记录
+   */
+  async getAutomatedChats(modelId?: string, limit: number = 50): Promise<AutomatedChat[]> {
+    try {
+      const params = new URLSearchParams();
+      if (modelId && modelId !== 'all') {
+        params.append('modelId', modelId);
+      }
+      params.append('limit', limit.toString());
+
+      const response = await fetch(`${this.baseUrl}/automated-chats?${params}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to fetch automated chats:', error);
       throw error;
     }
   }

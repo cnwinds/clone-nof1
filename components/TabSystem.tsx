@@ -6,17 +6,17 @@ import ModelChat from './tabs/ModelChat';
 import Positions from './tabs/Positions';
 import ReadmeTab from './tabs/ReadmeTab';
 
-type TabType = 'COMPLETED TRADES' | 'MODELCHAT' | 'POSITIONS' | 'README.TXT';
+type TabType = 'COMPLETED TRADES' | 'MODELCHAT' | 'POSITIONS' | 'README';
 
-const tabs: TabType[] = ['COMPLETED TRADES', 'MODELCHAT', 'POSITIONS', 'README.TXT'];
+const tabs: TabType[] = ['COMPLETED TRADES', 'MODELCHAT', 'POSITIONS', 'README'];
 
 export default function TabSystem() {
   const [activeTab, setActiveTab] = useState<TabType>('COMPLETED TRADES');
 
   return (
-    <div className="border border-terminal-green bg-black h-full">
+    <div className="border border-terminal-green bg-black h-full flex flex-col">
       {/* 标签页头部 */}
-      <div className="flex border-b border-terminal-green overflow-x-auto">
+      <div className="flex border-b border-terminal-green overflow-x-auto flex-shrink-0">
         {tabs.map((tab) => (
           <button
             key={tab}
@@ -33,11 +33,11 @@ export default function TabSystem() {
       </div>
 
       {/* 标签页内容 */}
-      <div className="p-4 min-h-[600px] max-h-[600px] overflow-y-auto">
+      <div className="flex-1 p-4 overflow-y-auto">
         {activeTab === 'COMPLETED TRADES' && <TradesList />}
         {activeTab === 'MODELCHAT' && <ModelChat />}
         {activeTab === 'POSITIONS' && <Positions />}
-        {activeTab === 'README.TXT' && <ReadmeTab />}
+        {activeTab === 'README' && <ReadmeTab />}
       </div>
     </div>
   );

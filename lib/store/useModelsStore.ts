@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AIModel, Trade, Position } from '@/types';
+import type { AIModel, Trade, Position, AutomatedChat } from '@/types';
 import { dataService } from '@/lib/services/dataService';
 
 interface ModelsState {
@@ -7,11 +7,15 @@ interface ModelsState {
   models: AIModel[];
   trades: Trade[];
   positions: Position[];
+  automatedChats: AutomatedChat[];
   
   // UI 状态
   selectedModel: string;      // 'all' 或模型 ID
   timeRange: 'ALL' | '72H';   // 时间范围
+  displayMode: '$' | '%';     // 显示模式：美元或百分比
   filterModel: string;        // 交易列表过滤
+  chatFilterModel: string;    // 聊天过滤
+  positionsFilterModel: string; // 持仓过滤
   
   // 加载状态
   loading: boolean;
@@ -20,12 +24,16 @@ interface ModelsState {
   // Actions
   setSelectedModel: (id: string) => void;
   setTimeRange: (range: 'ALL' | '72H') => void;
+  setDisplayMode: (mode: '$' | '%') => void;
   setFilterModel: (id: string) => void;
+  setChatFilterModel: (id: string) => void;
+  setPositionsFilterModel: (id: string) => void;
   
   // 数据加载
   loadModels: () => Promise<void>;
   loadTrades: (modelId?: string) => Promise<void>;
   loadPositions: (modelId?: string) => Promise<void>;
+  loadAutomatedChats: (modelId?: string) => Promise<void>;
   
   // 辅助方法
   getHighestModel: () => AIModel | null;
@@ -38,9 +46,13 @@ export const useModelsStore = create<ModelsState>((set, get) => ({
   models: [],
   trades: [],
   positions: [],
+  automatedChats: [],
   selectedModel: 'all',
   timeRange: 'ALL',
+  displayMode: '$',
   filterModel: 'all',
+  chatFilterModel: 'all',
+  positionsFilterModel: 'all',
   loading: false,
   error: null,
 
@@ -54,11 +66,26 @@ export const useModelsStore = create<ModelsState>((set, get) => ({
     set({ timeRange: range });
   },
 
+  // 设置显示模式
+  setDisplayMode: (mode: '$' | '%') => {
+    set({ displayMode: mode });
+  },
+
   // 设置交易过滤
   setFilterModel: (id: string) => {
     set({ filterModel: id });
     // 重新加载交易数据
     get().loadTrades(id === 'all' ? undefined : id);
+  },
+
+  // 设置聊天过滤
+  setChatFilterModel: (id: string) => {
+    set({ chatFilterModel: id });
+  },
+
+  // 设置持仓过滤
+  setPositionsFilterModel: (id: string) => {
+    set({ positionsFilterModel: id });
   },
 
   // 加载模型数据
@@ -92,6 +119,16 @@ export const useModelsStore = create<ModelsState>((set, get) => ({
       set({ positions });
     } catch (error) {
       console.error('Failed to load positions:', error);
+    }
+  },
+
+  // 加载自动化聊天记录
+  loadAutomatedChats: async (modelId?: string) => {
+    try {
+      const automatedChats = await dataService.getAutomatedChats(modelId, 50);
+      set({ automatedChats });
+    } catch (error) {
+      console.error('Failed to load automated chats:', error);
     }
   },
 

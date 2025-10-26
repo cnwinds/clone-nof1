@@ -1,151 +1,183 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import type { ChatMessage } from '@/types';
-
-const initialMessages: ChatMessage[] = [
-  {
-    id: '1',
-    role: 'system',
-    content: 'AI MODEL CHAT INTERFACE INITIALIZED...',
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    role: 'assistant',
-    content: 'Hello! I am ALPHA_TRADER_V2. How can I assist you with trading today?',
-    timestamp: new Date().toISOString(),
-  },
-];
+import { useEffect, useState } from 'react';
+import { useModelsStore } from '@/lib/store/useModelsStore';
+import type { AutomatedChat, ChatSection, TradingDecision } from '@/types';
 
 export default function ModelChat() {
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-  const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { 
+    models, 
+    chatFilterModel, 
+    setChatFilterModel, 
+    automatedChats, 
+    loadAutomatedChats 
+  } = useModelsStore();
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const [expandedSections, setExpandedSections] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    loadAutomatedChats(chatFilterModel === 'all' ? undefined : chatFilterModel);
+  }, [chatFilterModel, loadAutomatedChats]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  // 根据过滤器筛选聊天记录
+  const filteredChats = chatFilterModel === 'all'
+    ? automatedChats
+    : automatedChats.filter(chat => chat.modelId === chatFilterModel);
 
-    // 添加用户消息
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input,
-      timestamp: new Date().toISOString(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
-    setIsTyping(true);
-
-    // 模拟 AI 回复
-    setTimeout(() => {
-      const aiMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: generateAIResponse(input),
-        timestamp: new Date().toISOString(),
-      };
-      setMessages((prev) => [...prev, aiMessage]);
-      setIsTyping(false);
-    }, 1500);
+  const toggleSection = (chatId: string, sectionType: string) => {
+    const key = `${chatId}-${sectionType}`;
+    setExpandedSections(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
   };
 
-  const generateAIResponse = (userInput: string): string => {
-    const lowerInput = userInput.toLowerCase();
-    
-    if (lowerInput.includes('price') || lowerInput.includes('btc') || lowerInput.includes('bitcoin')) {
-      return 'Based on current market analysis, BTC is showing bullish momentum. The 24h trend indicates a +2.5% increase. Consider your risk tolerance before making trading decisions.';
-    }
-    if (lowerInput.includes('trade') || lowerInput.includes('buy') || lowerInput.includes('sell')) {
-      return 'I recommend analyzing the following factors:\n1. Market sentiment: Currently positive\n2. Volume trends: Increasing\n3. Technical indicators: RSI at 62\n\nWould you like me to execute a trade?';
-    }
-    if (lowerInput.includes('strategy') || lowerInput.includes('recommend')) {
-      return 'Current recommended strategy: MODERATE BUY on major coins. Focus on BTC and ETH with 60/40 allocation. Set stop-loss at -5%.';
-    }
-    
-    return 'I understand your query. As an AI trading model, I can help with market analysis, trade execution, and strategy recommendations. What specific aspect would you like to explore?';
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    return `${month}/${day} ${hours}:${minutes}:${seconds}`;
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
-  return (
-    <div className="flex flex-col h-[500px]">
-      <div className="text-terminal-green text-sm mb-4">
-        &gt; AI MODEL CHAT INTERFACE
-      </div>
-
-      {/* 消息列表 */}
-      <div className="flex-1 overflow-y-auto space-y-3 mb-4 pr-2 custom-scrollbar">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`${
-              message.role === 'user'
-                ? 'text-terminal-green'
-                : message.role === 'system'
-                ? 'text-terminal-dark-green text-xs'
-                : 'text-terminal-green'
-            }`}
-          >
-            <div className="text-xs text-terminal-dark-green mb-1">
-              [{message.role.toUpperCase()}] {new Date(message.timestamp).toLocaleTimeString()}
+  const renderTradingDecisions = (decisions: TradingDecision[]) => {
+    return (
+      <div className="space-y-1">
+        {decisions.map((decision, index) => (
+          <div key={index} className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-terminal-green">{decision.symbol}:</span>
+              <span className="text-terminal-green">QTY: {decision.quantity}</span>
             </div>
-            <div
-              className={`${
-                message.role === 'user'
-                  ? 'bg-terminal-gray border-l-2 border-terminal-green pl-3 py-2'
-                  : 'pl-3 py-1'
-              }`}
-            >
-              {message.role === 'user' && '> '}
-              {message.content}
+            <div className="flex items-center gap-2">
+              <span className={`font-bold ${
+                decision.action === 'BUY' ? 'text-terminal-green' :
+                decision.action === 'SELL' ? 'text-red-500' :
+                'text-yellow-500'
+              }`}>
+                {decision.action}
+              </span>
+              <span className="text-terminal-green">{decision.confidence}%</span>
             </div>
           </div>
         ))}
+      </div>
+    );
+  };
 
-        {isTyping && (
-          <div className="text-terminal-green pl-3 animate-pulse">
-            AI is typing...
+  const renderSection = (chat: AutomatedChat, section: ChatSection) => {
+    const key = `${chat.id}-${section.type}`;
+    const isExpanded = expandedSections[key] ?? section.expanded;
+
+    return (
+      <div key={section.type} className="border-b border-terminal-dark-green border-opacity-30">
+        <button
+          onClick={() => toggleSection(chat.id, section.type)}
+          className="w-full flex items-center justify-between p-2 text-left hover:bg-terminal-gray transition-colors"
+        >
+          <span className="text-terminal-green font-bold text-xs">{section.type}</span>
+          <span className="text-terminal-green text-xs">
+            {isExpanded ? '▼' : '▶'}
+          </span>
+        </button>
+        
+        {isExpanded && (
+          <div className="p-2 bg-terminal-gray bg-opacity-20">
+            {section.type === 'TRADING_DECISIONS' ? (
+              renderTradingDecisions(section.content as TradingDecision[])
+            ) : (
+              <div className="text-terminal-green text-xs leading-relaxed">
+                {section.content as string}
+              </div>
+            )}
           </div>
         )}
-        <div ref={messagesEndRef} />
+      </div>
+    );
+  };
+
+  return (
+    <div className="h-full flex flex-col">
+      {/* 过滤器头部 */}
+      <div className="flex items-center gap-4 border-b border-terminal-dark-green pb-2 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="text-terminal-green text-xs">FILTER:</span>
+          <select
+            value={chatFilterModel}
+            onChange={(e) => setChatFilterModel(e.target.value)}
+            className="bg-black border border-terminal-green text-terminal-green px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-terminal-green"
+          >
+            <option value="all">ALL MODELS</option>
+            {models.map(model => (
+              <option key={model.id} value={model.id}>
+                {model.displayName}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {/* 输入框 */}
-      <div className="border-t border-terminal-green pt-4">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Type your message..."
-            className="flex-1 bg-black border border-terminal-green text-terminal-green px-3 py-2 focus:outline-none focus:ring-2 focus:ring-terminal-green placeholder-terminal-dark-green"
-            disabled={isTyping}
-          />
-          <button
-            onClick={handleSend}
-            disabled={isTyping || !input.trim()}
-            className="terminal-button px-6 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            SEND
-          </button>
-        </div>
+      {/* 聊天记录列表 */}
+      <div className="flex-1 space-y-4 overflow-y-auto custom-scrollbar">
+        {filteredChats.length === 0 ? (
+          <div className="text-terminal-dark-green text-center py-4">
+            No automated chat logs found
+          </div>
+        ) : (
+          filteredChats.map((chat) => {
+            const key = `${chat.id}-main`;
+            const isExpanded = expandedSections[key] ?? false;
+            
+            return (
+              <div key={chat.id} className="space-y-1">
+                {/* 聊天消息头部 */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">{chat.icon}</span>
+                    <span className="text-terminal-green font-bold text-xs">
+                      {chat.modelName}
+                    </span>
+                  </div>
+                  <div className="text-terminal-dark-green text-xs">
+                    {formatTimestamp(chat.timestamp)}
+                  </div>
+                </div>
+
+                {/* 聊天内容框 */}
+                <div 
+                  className={`border p-2 cursor-pointer transition-all ${
+                    isExpanded 
+                      ? 'border-terminal-green bg-terminal-gray bg-opacity-20' 
+                      : 'border-terminal-dark-green hover:border-terminal-green'
+                  }`}
+                  onClick={() => toggleSection(chat.id, 'main')}
+                >
+                  <div className="text-terminal-green text-xs leading-relaxed">
+                    {chat.content}
+                  </div>
+                  
+                  {/* 点击展开提示 */}
+                  {chat.expandable && (
+                    <div className="mt-2 text-right">
+                      <span className="text-terminal-dark-green text-xs hover:text-terminal-green transition-colors">
+                        click to expand
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 展开的详细内容 */}
+                {isExpanded && chat.expandable && chat.sections && (
+                  <div className="ml-3 space-y-0">
+                    {chat.sections.map((section) => renderSection(chat, section))}
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
       </div>
 
       <style jsx>{`

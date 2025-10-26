@@ -9,14 +9,15 @@ import ConnectionStatus from '@/components/ConnectionStatus';
 import { useModelsStore } from '@/lib/store/useModelsStore';
 
 export default function Home() {
-  const { loadModels, loadTrades, loadPositions } = useModelsStore();
+  const { loadModels, loadTrades, loadPositions, loadAutomatedChats } = useModelsStore();
 
   useEffect(() => {
     // 初始化加载数据
     loadModels();
     loadTrades();
     loadPositions();
-  }, [loadModels, loadTrades, loadPositions]);
+    loadAutomatedChats();
+  }, [loadModels, loadTrades, loadPositions, loadAutomatedChats]);
 
   return (
     <>
@@ -25,7 +26,7 @@ export default function Home() {
       <div className="min-h-screen bg-black text-terminal-green">
         {/* Header */}
         <header className="border-b border-terminal-green p-4">
-          <div className="container mx-auto">
+          <div className="w-full px-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <h1 className="text-3xl font-bold text-glow">Alpha</h1>
@@ -51,15 +52,15 @@ export default function Home() {
         <EnhancedTicker />
 
         {/* Main Content */}
-        <main className="container mx-auto p-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+        <main className="w-full p-4">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 mb-4">
             {/* Left Column - Multi-Model Chart */}
-            <div className="lg:col-span-2">
+            <div className="xl:col-span-3 h-[600px] xl:h-[700px]">
               <MultiModelChart />
             </div>
 
             {/* Right Column - Tab System */}
-            <div>
+            <div className="xl:col-span-1 h-[600px] xl:h-[700px]">
               <TabSystem />
             </div>
           </div>
@@ -70,7 +71,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="border-t border-terminal-green p-4 mt-8">
-          <div className="container mx-auto text-center text-terminal-dark-green text-sm">
+          <div className="w-full px-4 text-center text-terminal-dark-green text-sm">
             <div className="mb-2">
               <pre className="inline-block text-xs">
 {`┌─────────────────────────────────────┐

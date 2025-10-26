@@ -26,6 +26,26 @@ body {
   overflow-x: hidden;
 }
 
+/* 确保全宽布局 */
+.w-full {
+  width: 100%;
+}
+
+/* 大屏幕优化 */
+@media (min-width: 1280px) {
+  .xl\:h-\[700px\] {
+    height: 700px;
+  }
+  
+  .xl\:min-h-\[700px\] {
+    min-height: 700px;
+  }
+  
+  .xl\:max-h-\[700px\] {
+    max-height: 700px;
+  }
+}
+
 /* 自定义滚动条 */
 ::-webkit-scrollbar {
   width: 10px;
