@@ -1,59 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import type { AIModel } from '@/types';
-
-const mockModels: AIModel[] = [
-  {
-    id: '1',
-    name: 'ALPHA_TRADER_V2',
-    rank: 1,
-    totalReturn: 145.67,
-    winRate: 78.5,
-    totalTrades: 1247,
-    status: 'active',
-  },
-  {
-    id: '2',
-    name: 'QUANTUM_BOT',
-    rank: 2,
-    totalReturn: 132.45,
-    winRate: 75.2,
-    totalTrades: 982,
-    status: 'active',
-  },
-  {
-    id: '3',
-    name: 'DEEP_LEARNING_TRADER',
-    rank: 3,
-    totalReturn: 118.23,
-    winRate: 72.8,
-    totalTrades: 1534,
-    status: 'active',
-  },
-  {
-    id: '4',
-    name: 'NEURAL_NET_PRO',
-    rank: 4,
-    totalReturn: 95.87,
-    winRate: 68.4,
-    totalTrades: 876,
-    status: 'active',
-  },
-  {
-    id: '5',
-    name: 'ML_PREDICTOR_X',
-    rank: 5,
-    totalReturn: 87.34,
-    winRate: 65.9,
-    totalTrades: 1123,
-    status: 'active',
-  },
-];
+import { useModelsStore } from '@/lib/store/useModelsStore';
 
 export default function Leaderboard() {
   const [expanded, setExpanded] = useState(true);
-  const [models] = useState<AIModel[]>(mockModels);
+  const { models } = useModelsStore();
+
+  // 按表现排序模型
+  const sortedModels = [...models].sort((a, b) => b.performance - a.performance);
 
   return (
     <div className="border border-terminal-green p-4 bg-black">
@@ -69,7 +24,7 @@ export default function Leaderboard() {
         </div>
       </div>
 
-      {expanded && (
+      {expanded && sortedModels.length > 0 && (
         <div className="space-y-2">
           {/* 表头 */}
           <div className="grid grid-cols-5 gap-2 text-terminal-dark-green text-xs border-b border-terminal-dark-green pb-2">
@@ -81,18 +36,27 @@ export default function Leaderboard() {
           </div>
 
           {/* 模型列表 */}
-          {models.map((model) => (
+          {sortedModels.map((model, index) => (
             <div
               key={model.id}
               className="grid grid-cols-5 gap-2 text-terminal-green text-sm hover:bg-terminal-gray transition-colors py-2 border-b border-terminal-dark-green border-opacity-30"
             >
-              <div className="font-bold">#{model.rank}</div>
-              <div className="font-mono">{model.name}</div>
-              <div className="text-right font-bold">
-                +{model.totalReturn.toFixed(2)}%
+              <div className="font-bold">#{index + 1}</div>
+              <div className="font-mono text-xs">{model.displayName}</div>
+              <div
+                className={`text-right font-bold ${
+                  model.performance >= 0 ? 'text-terminal-green' : 'text-red-500'
+                }`}
+              >
+                {model.performance >= 0 ? '+' : ''}
+                {model.performance.toFixed(2)}%
               </div>
-              <div className="text-right">{model.winRate.toFixed(1)}%</div>
-              <div className="text-right">{model.totalTrades.toLocaleString()}</div>
+              <div className="text-right">
+                {model.winRate ? model.winRate.toFixed(1) : 'N/A'}%
+              </div>
+              <div className="text-right">
+                {model.totalTrades?.toLocaleString() || 'N/A'}
+              </div>
             </div>
           ))}
         </div>
