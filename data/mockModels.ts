@@ -88,51 +88,64 @@ function generateValueHistory(
     
     switch (trendType) {
       case 'aggressive':
-        // 高波动，有大幅上涨和下跌
-        randomFactor = (Math.random() - 0.5) * 6 * volatility;
-        // 添加周期性波动
-        const aggressiveWave = Math.sin(progress * Math.PI * 4) * 0.3;
-        if (progress < 0.3) trendMultiplier = 1.2 + aggressiveWave; // 早期上涨
-        else if (progress > 0.7) trendMultiplier = 0.8 + aggressiveWave; // 后期调整
-        else trendMultiplier = 1 + progress * 0.4 + aggressiveWave;
+        // 极高波动，有大幅上涨和下跌
+        randomFactor = (Math.random() - 0.5) * 12 * volatility;
+        // 添加多个周期性波动
+        const aggressiveWave1 = Math.sin(progress * Math.PI * 6) * 0.6;
+        const aggressiveWave2 = Math.sin(progress * Math.PI * 12) * 0.3;
+        const aggressiveWave3 = Math.cos(progress * Math.PI * 8) * 0.4;
+        if (progress < 0.2) trendMultiplier = 1.4 + aggressiveWave1 + aggressiveWave2; // 早期大幅上涨
+        else if (progress > 0.8) trendMultiplier = 0.6 + aggressiveWave1 + aggressiveWave3; // 后期大幅调整
+        else trendMultiplier = 1 + progress * 0.6 + aggressiveWave1 + aggressiveWave2 + aggressiveWave3;
         break;
       case 'moderate':
-        // 中等波动，稳定上升但有起伏
-        randomFactor = (Math.random() - 0.5) * 3 * volatility;
-        const moderateWave = Math.sin(progress * Math.PI * 3) * 0.2;
-        trendMultiplier = 1 + progress * 0.3 + moderateWave;
+        // 高波动，稳定上升但有大幅起伏
+        randomFactor = (Math.random() - 0.5) * 8 * volatility;
+        const moderateWave1 = Math.sin(progress * Math.PI * 5) * 0.4;
+        const moderateWave2 = Math.sin(progress * Math.PI * 10) * 0.2;
+        trendMultiplier = 1 + progress * 0.5 + moderateWave1 + moderateWave2;
         break;
       case 'stable':
-        // 低波动，稳定增长但有小幅波动
-        randomFactor = (Math.random() - 0.5) * 1.5 * volatility;
-        const stableWave = Math.sin(progress * Math.PI * 2) * 0.1;
-        trendMultiplier = 1 + progress * 0.1 + stableWave;
+        // 中等波动，稳定增长但有明显波动
+        randomFactor = (Math.random() - 0.5) * 4 * volatility;
+        const stableWave1 = Math.sin(progress * Math.PI * 3) * 0.3;
+        const stableWave2 = Math.sin(progress * Math.PI * 7) * 0.15;
+        trendMultiplier = 1 + progress * 0.2 + stableWave1 + stableWave2;
         break;
       case 'declining':
-        // 持续下降但有反弹
-        randomFactor = (Math.random() - 0.5) * 2.5 * volatility;
-        const declineWave = Math.sin(progress * Math.PI * 2.5) * 0.15;
-        trendMultiplier = 1 - progress * 0.7 + declineWave;
+        // 高波动下降，有大幅反弹
+        randomFactor = (Math.random() - 0.5) * 6 * volatility;
+        const declineWave1 = Math.sin(progress * Math.PI * 4) * 0.3;
+        const declineWave2 = Math.sin(progress * Math.PI * 8) * 0.2;
+        trendMultiplier = 1 - progress * 0.8 + declineWave1 + declineWave2;
         break;
       case 'volatile':
-        // 高波动，先涨后跌，有剧烈波动
-        randomFactor = (Math.random() - 0.5) * 5 * volatility;
-        const volatileWave = Math.sin(progress * Math.PI * 6) * 0.4;
-        if (progress < 0.5) trendMultiplier = 1 + progress * 0.4 + volatileWave;
-        else trendMultiplier = 1.2 - (progress - 0.5) * 0.8 + volatileWave;
+        // 极高波动，先涨后跌，有剧烈波动
+        randomFactor = (Math.random() - 0.5) * 15 * volatility;
+        const volatileWave1 = Math.sin(progress * Math.PI * 8) * 0.6;
+        const volatileWave2 = Math.sin(progress * Math.PI * 16) * 0.3;
+        const volatileWave3 = Math.cos(progress * Math.PI * 12) * 0.4;
+        if (progress < 0.4) trendMultiplier = 1 + progress * 0.6 + volatileWave1 + volatileWave2;
+        else trendMultiplier = 1.3 - (progress - 0.4) * 1.2 + volatileWave1 + volatileWave3;
         break;
     }
     
     currentValue += valueChange * trendMultiplier + valueChange * randomFactor;
     
     // 添加额外的随机波动，模拟市场情绪
-    const marketNoise = (Math.random() - 0.5) * volatility * 0.5;
+    const marketNoise = (Math.random() - 0.5) * volatility * 1.5;
     currentValue += marketNoise;
     
     // 添加偶尔的大幅波动（模拟突发事件）
-    if (Math.random() < 0.05) { // 5%概率
-      const suddenMove = (Math.random() - 0.5) * volatility * 2;
+    if (Math.random() < 0.15) { // 15%概率（原来是5%）
+      const suddenMove = (Math.random() - 0.5) * volatility * 4; // 增加突发波动强度
       currentValue += suddenMove;
+    }
+    
+    // 添加额外的市场冲击波
+    if (Math.random() < 0.08) { // 8%概率
+      const shockWave = Math.sin(progress * Math.PI * 20) * volatility * 2;
+      currentValue += shockWave;
     }
     
     points.push({
@@ -339,7 +352,7 @@ export const mockModels: AIModel[] = [
     rank: 1,
     winRate: 78.5,
     totalTrades: 267,
-    valueHistory: generateValueHistory(10000, 17130.8, 0.8, 'aggressive'),
+    valueHistory: generateValueHistory(10000, 17130.8, 1.2, 'aggressive'),
   },
   {
     id: 'deepseek-chat-v3.1',
@@ -355,7 +368,7 @@ export const mockModels: AIModel[] = [
     rank: 2,
     winRate: 65.2,
     totalTrades: 198,
-    valueHistory: generateValueHistory(10000, 13563.00, 0.6, 'moderate'),
+    valueHistory: generateValueHistory(10000, 13563.00, 1.0, 'moderate'),
   },
   {
     id: 'btc-buyhold',
@@ -371,7 +384,7 @@ export const mockModels: AIModel[] = [
     rank: 3,
     winRate: 100,
     totalTrades: 1,
-    valueHistory: generateValueHistory(10000, 10250, 0.3, 'stable'),
+    valueHistory: generateValueHistory(10000, 10250, 0.6, 'stable'),
   },
   {
     id: 'claude-sonnet-4.1',
@@ -387,7 +400,7 @@ export const mockModels: AIModel[] = [
     rank: 4,
     winRate: 52.8,
     totalTrades: 156,
-    valueHistory: generateValueHistory(10000, 9247.2, 0.7, 'volatile'),
+    valueHistory: generateValueHistory(10000, 9247.2, 1.1, 'volatile'),
   },
   {
     id: 'grok-4',
@@ -403,7 +416,7 @@ export const mockModels: AIModel[] = [
     rank: 5,
     winRate: 48.3,
     totalTrades: 189,
-    valueHistory: generateValueHistory(10000, 9500, 0.8, 'volatile'),
+    valueHistory: generateValueHistory(10000, 9500, 1.3, 'volatile'),
   },
   {
     id: 'gemini-2.5-pro',
@@ -419,7 +432,7 @@ export const mockModels: AIModel[] = [
     rank: 6,
     winRate: 38.7,
     totalTrades: 142,
-    valueHistory: generateValueHistory(10000, 3357.40, 0.9, 'declining'),
+    valueHistory: generateValueHistory(10000, 3357.40, 1.4, 'declining'),
   },
   {
     id: 'gpt-6',
@@ -435,7 +448,7 @@ export const mockModels: AIModel[] = [
     rank: 7,
     winRate: 35.2,
     totalTrades: 124,
-    valueHistory: generateValueHistory(10000, 2969.21, 1.0, 'declining'),
+    valueHistory: generateValueHistory(10000, 2969.21, 1.5, 'declining'),
   },
 ];
 

@@ -72,13 +72,6 @@ export default function Home() {
         {/* Footer */}
         <footer className="border-t border-terminal-green p-4 mt-8">
           <div className="w-full px-4 text-center text-terminal-dark-green text-sm">
-            <div className="mb-2">
-              <pre className="inline-block text-xs">
-{`┌─────────────────────────────────────┐
-│   ALPHA ARENA - TRADING PLATFORM    │
-└─────────────────────────────────────┘`}
-              </pre>
-            </div>
             <div>© 2025 NOF1.AI | AI-Powered Cryptocurrency Trading</div>
           </div>
         </footer>

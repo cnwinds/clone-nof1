@@ -49,39 +49,42 @@ export default function EnhancedTicker() {
         {/* 左侧：加密货币价格静态显示 */}
         <div className="flex-[2_2_0%] py-1 px-4">
           <div className="flex flex-wrap gap-x-8 gap-y-2">
-            {prices.map((crypto) => (
-              <div
-                key={crypto.id}
-                className="flex flex-col text-terminal-green"
-              >
-                <span className="font-bold text-base">{crypto.symbol.toUpperCase()}</span>
-                <div className="flex items-center text-sm">
-                  <span>
-                    ${crypto.current_price.toLocaleString('en-US', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: crypto.current_price < 1 ? 4 : 2,
-                    })}
-                  </span>
-                  <span
-                    className={`ml-2 ${
-                      crypto.price_change_percentage_24h >= 0
-                        ? 'text-terminal-green'
-                        : 'text-red-500'
-                    }`}
-                  >
-                    {crypto.price_change_percentage_24h >= 0 ? '▲' : '▼'}
-                    {Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%
-                  </span>
+            {prices.map((crypto, index) => (
+              <div key={crypto.id} className="flex items-center">
+                <div className="flex flex-col text-terminal-green">
+                  <span className="font-bold text-base">{crypto.symbol.toUpperCase()}</span>
+                  <div className="flex items-center text-sm">
+                    <span>
+                      ${crypto.current_price.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: crypto.current_price < 1 ? 4 : 2,
+                      })}
+                    </span>
+                    <span
+                      className={`ml-2 ${
+                        crypto.price_change_percentage_24h >= 0
+                          ? 'text-terminal-green'
+                          : 'text-red-500'
+                      }`}
+                    >
+                      {crypto.price_change_percentage_24h >= 0 ? '▲' : '▼'}
+                      {Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%
+                    </span>
+                  </div>
                 </div>
+                {/* 添加半截分割线 */}
+                {index < prices.length - 1 && (
+                  <div className="ml-4 h-8 w-px bg-terminal-green opacity-50"></div>
+                )}
               </div>
             ))}
           </div>
         </div>
 
         {/* 右侧：模型统计 */}
-        <div className="flex-[1_1_0%] border-l border-terminal-green py-1 px-4 bg-black flex items-center justify-end gap-6">
+        <div className="flex-[1_1_0%] py-1 px-4 bg-black flex items-center justify-end gap-6">
           {highestModel && (
-            <div className="text-right">
+            <div className="text-left">
               <div className="text-terminal-dark-green text-xs mb-0.5">
                 HIGHEST: 🏆
               </div>
@@ -103,7 +106,7 @@ export default function EnhancedTicker() {
           )}
 
           {lowestModel && (
-            <div className="text-right">
+            <div className="text-left">
               <div className="text-terminal-dark-green text-xs mb-0.5">
                 LOWEST: 📉
               </div>
